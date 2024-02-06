@@ -11,14 +11,13 @@ class token:
         print(self.value,end=",")
 
 class Tokenizer:
-    tokenBreakers = ['\n',' ','\t',';']
-    def __init__(self):
-        pass
+    tokenBreakers = ['\n',' ','\t',';'] #line breakers
+    
     def tokenize(self,text:str) -> list[token]:
         text += '\n'
         TokenStream:list[token] = []
         strInput = ""
-        for i in text:
+        for i in text: #character by character not word by word
             if i in self.tokenBreakers:
                 if len(strInput) == 0:
                     continue
@@ -33,4 +32,5 @@ myTokenizer = Tokenizer()
 text:str = fileManger.get_text("hello.txt")
 
 for i in myTokenizer.tokenize(text):
+    i.print()
     i.print()
