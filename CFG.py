@@ -4,11 +4,14 @@ class production_rule:
     def __init__(self,start_symbol,value):
         self.start_symbol=start_symbol
         self.value = value
+    def __eq__(self, __value) -> bool:
+        if isinstance(__value,production_rule):
+            return self.value == __value.value and self.start_symbol == __value.start_symbol
+        return False
     def isLeftRecursive(self):
         if self.start_symbol==self.value[0]:
             return True
         return False
-        
 
 class context_free_grammar:
     def __init__(self,start_symbol,prod_rules,terminals,non_terminals):
@@ -49,36 +52,26 @@ class context_free_grammar:
                 if (not fixed):
                     print("Error: no reule with simiar start symbol")
                     return
-                    
+
             else: 
                 fixed_prod_rules.append(i)
 
         self.prod_rules = fixed_prod_rules
         for i in fixers:
             self.prod_rules.remove(i)
-    
-    # def removeDuplicateProdRules(self):
-    #     arr = []
-    #     for i in range(0,len(self.print_prod_rules)):
-    #         for j in range(0,len(self.print_prod_rules)):
-    #         if self.prod_rules.count(self.prod_rules[i]) >1:
-    #             self.prod_rules.pop(i)
 
-
-    
-
+    def removeDuplicateProdRules(self):
+        arr = []
+        for i in self.prod_rules:
+                    if arr.count(i) ==0:
+                        arr.append(i)
+        self.prod_rules = arr 
 
 myRule = production_rule("A","Aa")
-#print(myRule.isLeftRecursive())
-
 myRule2 = production_rule("A","b")
-
-
-#print(myRule2.isLeftRecursive())
 
 myCFG = context_free_grammar("E",[myRule,myRule2],"e","f")
 myCFG.add_prod_rule(production_rule("A","A+R"))
-
 
 myCFG.left_recursion()
 myCFG.removeDuplicateProdRules()
