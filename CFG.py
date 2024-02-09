@@ -15,8 +15,8 @@ class production_rule:
         return False
     
     def output(self):
-       
         return self.start_symbol+" => "+self.value
+        
     def copy(self):
         return production_rule(self.start_symbol,self.value)
 
@@ -41,8 +41,8 @@ class context_free_grammar:
         print("\n\t",end="")
         for i in self.terminals:
             if i!="£":
-                print("{:<10}".format(i),end="|")
-
+                print("{:<12}".format(i),end="|")
+        #print("\n______________________________________________________",end="")
         for i in self.predictive_matrix:
             print("\n"+i+":",end="\t")
             for j in self.predictive_matrix[i]:
@@ -152,7 +152,20 @@ class context_free_grammar:
             i+= 1
         return prod_array
         
-      
+    def add_epsilon_rules_predictive(self):
+        first_set = self.compute_first()
+        print("\nFirst set: ",first_set)
+        for non_terminal, terminals in first_set.items():
+            if "£" in terminals:
+                for term in self.compute_follow()[non_terminal]:
+                    new = production_rule(non_terminal,"£")
+                    self.predictive_matrix[non_terminal][term] = new.copy()
+                    print("\nnt and terminal: ", non_terminal,term )
+                    print("\nepsilon rule: ", new.output() )
+                    #print("epsilon rule: ", self.predictive_matrix[non_terminal][term] )
+                    self.print_predictive_matrix()
+
+
     def print_prod_rules(self):
         for i in self.prod_rules:
             print(i.start_symbol, " => ",i.value)
@@ -234,5 +247,6 @@ print("\nFollow:")
 for non_terminal, terminals in follow_set.items():
     print(non_terminal, ":", terminals) 
 
-myCFG.print_predictive_matrix()
+myCFG.add_epsilon_rules_predictive()
+#myCFG.print_predictive_matrix()
 #print(myCFG.predictive_matrix)
