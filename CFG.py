@@ -25,7 +25,7 @@ class context_free_grammar:
     def compute_first(self):
         first = {}
         for non_terminal in self.non_terminals:
-            first[non_terminal] = set()
+            first[non_terminal] = set() #first is dict, key is non_terminal
 
         while True:
             updated = False
@@ -131,13 +131,16 @@ myRule4 = production_rule("T", "F")
 myRule5 = production_rule("F", "(E)")
 myRule6 = production_rule("F", "id")
 
+prodRules=[myRule,myRule2,myRule3,myRule4,myRule5,myRule6]
+
+
 terminals = set()
 for rule in [myRule, myRule2]:
     for symbol in rule.value:
         if symbol:
             terminals.add(symbol)
             
-myCFG = context_free_grammar("E", [myRule, myRule2,myRule3,myRule4,myRule5,myRule6], terminals, {"E", "T","F"})
+myCFG = context_free_grammar("E", [myRule, myRule2,myRule3,myRule4,myRule5,myRule6], ["+","*","(",")","id"], ["E", "T","F"])
 
 myCFG.left_recursion()
 myCFG.removeDuplicateProdRules()
