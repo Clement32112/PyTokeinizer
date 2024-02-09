@@ -22,6 +22,15 @@ class context_free_grammar:
 
     def add_prod_rule(self,prod_rule):
         self.prod_rules.append(prod_rule)
+
+    def group_pro_rules(self):
+        prod_rules_dictionary = {}
+        for i in self.prod_rules:
+            if i.start_symbol in prod_rules_dictionary:
+                prod_rules_dictionary[i.start_symbol].append(i.value)
+            else:
+                prod_rules_dictionary[i.start_symbol] = [i.value]
+        return prod_rules_dictionary
     
     def compute_first(self):
         first = {}
@@ -136,6 +145,68 @@ class context_free_grammar:
                     if arr.count(i) ==0:
                         arr.append(i)
         self.prod_rules = arr 
+
+    def remove_duplicates_from_list(self, input_list):
+        unique_list = []
+        for item in input_list:
+            if item not in unique_list:
+                unique_list.append(item)
+        return unique_list
+
+
+    def leftFactor(self):
+        prod_dict = self.group_pro_rules()
+        prod_temp_store = {}
+        for key, value in prod_dict.items():
+            list_of_items = []
+            for token in value:
+                for i in range(len(token)):
+                    if(i == 0):
+                        list_of_items.append(token[i])
+                    else:
+                        for j in value:
+                            if(j != token):
+                                if token[:i + 1] == j[:i + 1]:
+                                    if token[: i] in list_of_items:
+                                        index = list_of_items.index(token[: i])  
+                                        list_of_items[index] = token[:i + 1]
+
+            unique_list = self.remove_duplicates_from_list(list_of_items)
+            prod_temp_store[key] = unique_list
+        left_factored_rules = {}
+        for key, value in prod_temp_store.items():
+            values_to_compare_with = prod_dict[key]
+            count = 0
+            for shortened_token in value:
+                for full_token in values_to_compare_with:
+                    if shortened_token == full_token[: len(shortened_token)]:
+                        count += 1
+                if count  == 1:
+                    for full_token in values_to_compare_with:
+                        if shortened_token == full_token[: len(shortened_token)]:
+                            if key in left_factored_rules:
+                                left_factored_rules[key].append(full_token)
+                            else:
+                                left_factored_rules[key] = [full_token]
+                else:
+                    substituted_values = []
+                    if key in left_factored_rules:
+                        left_factored_rules[key].append(shortened_token + key + "_prime")
+                    else:
+                        left_factored_rules[key] = [shortened_token + key + "_prime"]
+
+                    for full_token in values_to_compare_with:
+                        if shortened_token == full_token[: len(shortened_token)]:
+                            result = full_token[len(shortened_token):]
+                            if(result == ""):
+                                substituted_values.append("$")
+                            else:
+                                substituted_values.append(result)
+                    left_factored_rules[key + "_prime"] = substituted_values
+                count = 0
+        for key, value in left_factored_rules.items():
+            for i in value:
+                self.add_prod_rule(production_rule(key,i))
 
 myRule = production_rule("E", "E+T")
 myRule2 = production_rule("E", "T")
