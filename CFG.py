@@ -19,6 +19,7 @@ class context_free_grammar:
         self.prod_rules = prod_rules
         self.terminals = terminals
         self.non_terminals = non_terminals
+
     def add_prod_rule(self,prod_rule):
         self.prod_rules.append(prod_rule)
     
@@ -34,6 +35,10 @@ class context_free_grammar:
                 if production[0] in self.terminals:  # if first symbol is terminal, add it to first set
                     if production[0] not in first[non_terminal]:
                         first[non_terminal].add(production[0])
+                        updated = True
+                elif production[0:2] == "id":
+                    if "id" not in first[non_terminal]:
+                        first[non_terminal].add(production[0:2])
                         updated = True
                 elif production[0] in self.non_terminals:  # if first symbol is non-terminal, add its first set
                     for terminal in first[production[0]]:
@@ -85,9 +90,17 @@ class context_free_grammar:
         pass
 
     def fixLeftRecursion(self,recursive,non_recursive):
+        newNT = recursive.start_symbol + "`"
+
         new_prod = production_rule(recursive.start_symbol, non_recursive.value + recursive.start_symbol+"`") #unprimed version
         new_prod2 = production_rule(recursive.start_symbol + "`", recursive.value[1:]+recursive.start_symbol+"`") #primed version
         new_prod3 = production_rule(recursive.start_symbol + "`", "£") #epsilon
+        
+        if newNT not in self.non_terminals:
+            self.non_terminals.append(newNT)
+
+        if "£" not in self.terminals:
+            self.terminals.append("£")
         
         return [new_prod,new_prod2,new_prod3]
 
@@ -130,8 +143,6 @@ myRule3 = production_rule("T", "T*F")
 myRule4 = production_rule("T", "F")
 myRule5 = production_rule("F", "(E)")
 myRule6 = production_rule("F", "id")
-
-prodRules=[myRule,myRule2,myRule3,myRule4,myRule5,myRule6]
 
 
 terminals = set()
