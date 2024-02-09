@@ -12,15 +12,9 @@ class production_rule:
         if self.start_symbol==self.value[0]:
             return True
         return False
-    def hasSymbol(self,symbol):
-        for i in range(len(self.value)):
-            if len(self.value) < i+ len(symbol):
-                return False 
-            if self.value[i:i+len(symbol)] == symbol:
-                return True
-        return False
     def print(self):
         print(self.start_symbol," => ",self.value)
+
 class context_free_grammar:
     def __init__(self,start_symbol,prod_rules,terminals,non_terminals):
         self.start_symbol=start_symbol
@@ -57,20 +51,6 @@ class context_free_grammar:
                 break
 
         return first
-
-    def compute_follow_recursive(self,symbol,follow = {}):
-        if len(follow) == 0:
-            for non_terminal in self.non_terminals:
-                follow[non_terminal] = set() # {E,E`,T,T`,F} 
-            follow[self.start_symbol].add('$')  # add end marker to start symbol {E: [$] }
-
-        current_prod_rules = [] # an array of the prod rules that have that symbol
-        for i in self.prod_rules:
-            if i.hasSymbol(symbol):
-                current_prod_rules.append(i)
-        for i in current_prod_rules:
-            i.print()
-        return follow 
 
 
     def compute_follow(self):
@@ -198,17 +178,14 @@ myRule6 = production_rule("F", "id")
 
 myCFG = context_free_grammar("E", [myRule, myRule2,myRule3,myRule4,myRule5,myRule6], ["+","*","(",")","id"], ["E", "T","F"])
 
-#print("Array: ",myCFG.valueToProdArray("E`+TT`id+id)"))
 myCFG.left_recursion()
 myCFG.removeDuplicateProdRules()
-#myCFG.print_prod_rules()
-print(myCFG.compute_follow_recursive(myCFG.start_symbol))
-"""
+
 first_set = myCFG.compute_first()
 print("First:")
 for non_terminal, terminals in first_set.items():
     print(non_terminal, ":", terminals) 
-"""
+
 follow_set = myCFG.compute_follow()
 print("\nFollow:")
 for non_terminal, terminals in follow_set.items():
