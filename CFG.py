@@ -58,6 +58,7 @@ class context_free_grammar:
         for non_terminal in self.non_terminals:
             follow[non_terminal] = set() # {E,E`,T,T`,F} 
         follow[self.start_symbol].add('$')  # add end marker to start symbol {E: [$] }
+        self.terminals.append("$")
 
         while True:
             updated = False
@@ -141,7 +142,6 @@ class context_free_grammar:
         fixers = []  #production rules used in fixing left recusive production rules
         for i in self.prod_rules:
             if i.isLeftRecursive():
-                print("me left recurs")
                 fixed = False
                 for j in self.prod_rules:
                     if j.start_symbol==i.start_symbol:
@@ -178,11 +178,18 @@ myRule6 = production_rule("F", "id")
 
 myCFG = context_free_grammar("E", [myRule, myRule2,myRule3,myRule4,myRule5,myRule6], ["+","*","(",")","id"], ["E", "T","F"])
 
+print("\nProduction rules: ")
+myCFG.print_prod_rules()
+
+print("\nEliminate left recursion: ")
 myCFG.left_recursion()
 myCFG.removeDuplicateProdRules()
+myCFG.print_prod_rules()
 
+
+print("\nCompute first and follow funtions: ")
 first_set = myCFG.compute_first()
-print("First:")
+print("\nFirst:")
 for non_terminal, terminals in first_set.items():
     print(non_terminal, ":", terminals) 
 
@@ -190,3 +197,5 @@ follow_set = myCFG.compute_follow()
 print("\nFollow:")
 for non_terminal, terminals in follow_set.items():
     print(non_terminal, ":", terminals) 
+
+
