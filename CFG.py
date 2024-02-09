@@ -1,10 +1,10 @@
 class production_rule:
     value:str
     start_symbol =""
-    def _init_(self,start_symbol,value):
+    def __init__(self,start_symbol,value):
         self.start_symbol=start_symbol
         self.value = value
-    def _eq_(self, __value) -> bool:
+    def __eq__(self, __value) -> bool:
         if isinstance(__value,production_rule):
             return self.value == __value.value and self.start_symbol == __value.start_symbol
         return False
@@ -14,7 +14,7 @@ class production_rule:
         return False
 
 class context_free_grammar:
-    def _init_(self,start_symbol,prod_rules,terminals,non_terminals):
+    def __init__(self,start_symbol,prod_rules,terminals,non_terminals):
         self.start_symbol=start_symbol
         self.prod_rules = prod_rules
         self.terminals = terminals
@@ -86,7 +86,7 @@ class context_free_grammar:
 
     def fixLeftRecursion(self,recursive,non_recursive):
         new_prod = production_rule(recursive.start_symbol, non_recursive.value + recursive.start_symbol+"`") #unprimed version
-        new_prod2 = production_rule(recursive.start_symbol + "", recursive.value[1:]+recursive.start_symbol+"") #primed version
+        new_prod2 = production_rule(recursive.start_symbol + "`", recursive.value[1:]+recursive.start_symbol+"`") #primed version
         new_prod3 = production_rule(recursive.start_symbol + "`", "£") #epsilon
         
         return [new_prod,new_prod2,new_prod3]
@@ -124,8 +124,12 @@ class context_free_grammar:
                         arr.append(i)
         self.prod_rules = arr 
 
-myRule = production_rule("A", "Ea")
-myRule2 = production_rule("A", "b")
+myRule = production_rule("E", "E+T")
+myRule2 = production_rule("E", "T")
+myRule3 = production_rule("T", "T*F")
+myRule4 = production_rule("T", "F")
+myRule5 = production_rule("F", "(E)")
+myRule6 = production_rule("F", "id")
 
 terminals = set()
 for rule in [myRule, myRule2]:
@@ -133,8 +137,7 @@ for rule in [myRule, myRule2]:
         if symbol:
             terminals.add(symbol)
             
-myCFG = context_free_grammar("E", [myRule, myRule2], terminals, {"E", "A"})
-myCFG.add_prod_rule(production_rule("A", "A+R"))
+myCFG = context_free_grammar("E", [myRule, myRule2,myRule3,myRule4,myRule5,myRule6], terminals, {"E", "T","F"})
 
 myCFG.left_recursion()
 myCFG.removeDuplicateProdRules()
@@ -145,7 +148,8 @@ print("First:")
 for non_terminal, terminals in first_set.items():
     print(non_terminal, ":", terminals)
 
-follow_set = myCFG.compute_follow()
+""" follow_set = myCFG.compute_follow()
 print("\nFollow:")
 for non_terminal, terminals in follow_set.items():
     print(non_terminal, ":", terminals)
+ """
