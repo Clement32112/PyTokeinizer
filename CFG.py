@@ -8,12 +8,17 @@ class production_rule:
         if isinstance(__value,production_rule):
             return self.value == __value.value and self.start_symbol == __value.start_symbol
         return False
+    
     def isLeftRecursive(self):
         if self.start_symbol==self.value[0]:
             return True
         return False
-    def print(self):
-        print(self.start_symbol," => ",self.value)
+    
+    def output(self):
+       
+        return self.start_symbol+" => "+self.value
+    def copy(self):
+        return production_rule(self.start_symbol,self.value)
 
 class context_free_grammar:
     def __init__(self,start_symbol,prod_rules,terminals,non_terminals):
@@ -21,11 +26,34 @@ class context_free_grammar:
         self.prod_rules = prod_rules
         self.terminals = terminals
         self.non_terminals = non_terminals
+        self.predictive_matrix={}
+        
+    def define_predictive_matrix(self):
+        for i in self.non_terminals:
+            self.predictive_matrix[i]={}
+            for j in self.terminals:
+                if j!="£":
+                    self.predictive_matrix[i][j] = production_rule("","")
+
+    def print_predictive_matrix(self):
+        #print column headers
+        print("\nPredictive Parsing Table")
+        print("\n\t",end="")
+        for i in self.terminals:
+            if i!="£":
+                print("{:<10}".format(i),end="|")
+
+        for i in self.predictive_matrix:
+            print("\n"+i+":",end="\t")
+            for j in self.predictive_matrix[i]:
+                print(j,"{:<10}".format(self.predictive_matrix[i][j].output()),end="|")
+                #print (self.predictive_matrix[i][j]+"\t\t",end="|")
 
     def add_prod_rule(self,prod_rule):
         self.prod_rules.append(prod_rule)
     
     def compute_first(self):
+        myCFG.define_predictive_matrix()
         first = {}
         for non_terminal in self.non_terminals:
             first[non_terminal] = set() #first is dict, key is non_terminal
@@ -36,16 +64,20 @@ class context_free_grammar:
                 non_terminal, production = rule.start_symbol, rule.value
                 if production[0] in self.terminals:  # if first symbol is terminal, add it to first set
                     if production[0] not in first[non_terminal]:
+                        if production[0]!="£":
+                            self.predictive_matrix[non_terminal][production[0]] = rule.copy() #add rule to predictive table matrix
                         first[non_terminal].add(production[0])
                         updated = True
                 elif production[0:2] == "id":
                     if "id" not in first[non_terminal]:
                         first[non_terminal].add(production[0:2])
+                        self.predictive_matrix[non_terminal][production[0:2]] = rule.copy() #add rule to predictive table matrix
                         updated = True
                 elif production[0] in self.non_terminals:  # if first symbol is non-terminal, add its first set
                     for terminal in first[production[0]]:
                         if terminal not in first[non_terminal]:
                             first[non_terminal].add(terminal)
+                            self.predictive_matrix[non_terminal][terminal] = rule.copy() #add rule to predictive table matrix
                             updated = True
             if not updated:
                 break
@@ -82,8 +114,12 @@ class context_free_grammar:
                                     updated = True
                             else:  # if next symbol is non-terminal
                                 for terminal in self.compute_first()[next_symbol]:
+
                                     if terminal == "£":
                                         follow[production[i]] =follow[production[i]].union(follow[next_symbol])
+                                        """for i in follow[next_symbol]:
+                                            print("in followof next ",i)
+                                            self.predictive_matrix[next_symbol][i] = production_rule(next_symbol,"£") """
                                         continue
                                       #  print("£ ", next_symbol ," ", non_terminal, "=>", production)
 
@@ -152,7 +188,7 @@ class context_free_grammar:
                             fixed = True
                             continue
                 if (not fixed):
-                    print("Error: no reule with simiar start symbol")
+                    print("Error: no rule with similar start symbol")
                     return
 
             else: 
@@ -198,4 +234,5 @@ print("\nFollow:")
 for non_terminal, terminals in follow_set.items():
     print(non_terminal, ":", terminals) 
 
-
+myCFG.print_predictive_matrix()
+#print(myCFG.predictive_matrix)
