@@ -1,3 +1,13 @@
+#for terminals and non terminals
+class node:
+    value:str
+    node_type:str
+
+    def __init__(self,node_type,value):
+        self.node_type = node_type
+        self.value = value
+
+
 class production_rule:
     value:str
     start_symbol =""
@@ -14,11 +24,25 @@ class production_rule:
         return False
 
 class context_free_grammar:
+    def NT(self,value):
+        for non_terminal in self.non_terminals:
+            if value == non_terminal.value:
+                return non_terminal
+        new_NT = node("NT",value)
+        self.non_terminals.append(new_NT)
+        return new_NT
+
     def __init__(self,start_symbol,prod_rules,terminals,non_terminals):
         self.start_symbol=start_symbol
         self.prod_rules = prod_rules
         self.terminals = terminals
-        self.non_terminals = non_terminals
+        self.non_terminals=[]
+        for nt in non_terminals:
+            self.NT(nt)
+        print(self.non_terminals)
+
+    
+
     def add_prod_rule(self,prod_rule):
         self.prod_rules.append(prod_rule)
     
