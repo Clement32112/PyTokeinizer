@@ -162,8 +162,7 @@ print("First:")
 for non_terminal, terminals in first_set.items():
     print(non_terminal, ":", terminals)
 
-""" follow_set = myCFG.compute_follow()
+follow_set = myCFG.compute_follow()
 print("\nFollow:")
 for non_terminal, terminals in follow_set.items():
     print(non_terminal, ":", terminals)
- """
