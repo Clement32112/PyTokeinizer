@@ -12,6 +12,14 @@ class production_rule:
         if self.start_symbol==self.value[0]:
             return True
         return False
+    def hasSymbol(self,symbol):
+        for i in range(len(self.value)):
+            if len(self.value) < i+ len(symbol):
+                return False
+            if self.value[i:i+len(symbol)] == symbol:
+                return True
+            else:
+                return False
 
 class context_free_grammar:
     def __init__(self,start_symbol,prod_rules,terminals,non_terminals):
@@ -50,17 +58,24 @@ class context_free_grammar:
 
         return first
 
+    def compute_follow_recursive(self,symbol):
+        for i in self.prod_rules:
+
+            pass
+
+        pass
     def compute_follow(self):
         follow = {}
         for non_terminal in self.non_terminals:
-            follow[non_terminal] = set()
-        follow[self.start_symbol].add('$')  # add end marker to start symbol
+            follow[non_terminal] = set() # {E,E`,T,T`,F} 
+        follow[self.start_symbol].add('$')  # add end marker to start symbol {E: [$] }
 
         while True:
             updated = False
-            for rule in self.prod_rules:
+            for rule in self.prod_rules: # each production rule
                 non_terminal, production = rule.start_symbol, rule.value
-                for i in range(len(production)):
+                production = self.valueToProdArray(production) # converts E+id+T` to [E,+,id,T`]
+                for i in range(len(production)): # E' => [+,T,E`]
                     if production[i] in self.non_terminals:  # if symbol is non-terminal
                         if i == len(production) - 1:  # if it's the last symbol in production
                             for terminal in follow[non_terminal]:
@@ -69,12 +84,16 @@ class context_free_grammar:
                                     updated = True
                         else:
                             next_symbol = production[i + 1]
-                            if next_symbol in self.terminals:  # if next symbol is terminal
+                          
+                            if next_symbol in self.terminals :  # if next symbol is terminal
+                                #print("check: ",production[i], production[i+1])
                                 if next_symbol not in follow[production[i]]:
                                     follow[production[i]].add(next_symbol)
                                     updated = True
                             else:  # if next symbol is non-terminal
                                 for terminal in self.compute_first()[next_symbol]:
+                                    #if terminal == "£":
+                                      #  print("£ ", next_symbol ," ", non_terminal, "=>", production)
                                     if terminal not in follow[production[i]]:
                                         follow[production[i]].add(terminal)
                                         updated = True
@@ -83,7 +102,28 @@ class context_free_grammar:
                 break
 
         return follow
-    
+
+    def valueToProdArray(self,value):
+        prod_array =[]
+        i = 0
+        while i < len(value):  #loops through all charaters in production value
+
+            if i+1 >= len(value): # Stop converting if at end
+                prod_array.append(value[i])
+                return prod_array
+                
+            if value[i+1] == '`':
+                prod_array.append(value[i:i+2]) # add Termial with backtick(`)
+                i+= 1
+            elif value[i:i+2] == "id":
+                 prod_array.append(value[i:i+2]) # add id 
+                 i+= 1
+            else:
+                prod_array.append(value[i])
+            i+= 1
+        return prod_array
+        
+      
     def print_prod_rules(self):
         for i in self.prod_rules:
             print(i.start_symbol, " => ",i.value)
@@ -144,23 +184,19 @@ myRule4 = production_rule("T", "F")
 myRule5 = production_rule("F", "(E)")
 myRule6 = production_rule("F", "id")
 
+print("Found") if myRule5.hasSymbol("E") else print("Not found")
 
-terminals = set()
-for rule in [myRule, myRule2]:
-    for symbol in rule.value:
-        if symbol:
-            terminals.add(symbol)
             
 myCFG = context_free_grammar("E", [myRule, myRule2,myRule3,myRule4,myRule5,myRule6], ["+","*","(",")","id"], ["E", "T","F"])
-
+#print("Array: ",myCFG.valueToProdArray("E`+TT`id+id)"))
 myCFG.left_recursion()
 myCFG.removeDuplicateProdRules()
-myCFG.print_prod_rules()
+#myCFG.print_prod_rules()
 
 first_set = myCFG.compute_first()
 print("First:")
 for non_terminal, terminals in first_set.items():
-    print(non_terminal, ":", terminals)
+    print(non_terminal, ":", terminals) 
 
 follow_set = myCFG.compute_follow()
 print("\nFollow:")
