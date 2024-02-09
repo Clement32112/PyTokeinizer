@@ -66,7 +66,63 @@ class context_free_grammar:
                     if arr.count(i) ==0:
                         arr.append(i)
         self.prod_rules = arr 
+    def compute_first(self):
+        first = {}
+        for non_terminal in self.non_terminals:
+            first[non_terminal] = set()
 
+        while True:
+            updated = False
+            for rule in self.prod_rules:
+                non_terminal, production = rule.start_symbol, rule.value
+                if production[0] in self.terminals:  # if first symbol is terminal, add it to first set
+                    if production[0] not in first[non_terminal]:
+                        first[non_terminal].add(production[0])
+                        updated = True
+                elif production[0] in self.non_terminals:  # if first symbol is non-terminal, add its first set
+                    for terminal in first[production[0]]:
+                        if terminal not in first[non_terminal]:
+                            first[non_terminal].add(terminal)
+                            updated = True
+            if not updated:
+                break
+
+        return first
+
+    def compute_follow(self):
+        follow = {}
+        for non_terminal in self.non_terminals:
+            follow[non_terminal] = set()
+        follow[self.start_symbol].add('$')  # add end marker to start symbol
+
+        while True:
+            updated = False
+            for rule in self.prod_rules:
+                non_terminal, production = rule.start_symbol, rule.value
+                for i in range(len(production)):
+                    if production[i] in self.non_terminals:  # if symbol is non-terminal
+                        if i == len(production) - 1:  # if it's the last symbol in production
+                            for terminal in follow[non_terminal]:
+                                if terminal not in follow[production[i]]:
+                                    follow[production[i]].add(terminal)
+                                    updated = True
+                        else:
+                            next_symbol = production[i + 1]
+                            if next_symbol in self.terminals:  # if next symbol is terminal
+                                if next_symbol not in follow[production[i]]:
+                                    follow[production[i]].add(next_symbol)
+                                    updated = True
+                            else:  # if next symbol is non-terminal
+                                for terminal in self.compute_first()[next_symbol]:
+                                    if terminal not in follow[production[i]]:
+                                        follow[production[i]].add(terminal)
+                                        updated = True
+
+            if not updated:
+                break
+
+        return follow
+  
 myRule = production_rule("A","Aa")
 myRule2 = production_rule("A","b")
 
@@ -76,3 +132,13 @@ myCFG.add_prod_rule(production_rule("A","A+R"))
 myCFG.left_recursion()
 myCFG.removeDuplicateProdRules()
 myCFG.print_prod_rules()
+
+first_set = myCFG.compute_first()
+print("First:")
+for non_terminal, terminals in first_set.items():
+    print(non_terminal, ":", terminals)
+
+follow_set = myCFG.compute_follow()
+print("\nFollow:")
+for non_terminal, terminals in follow_set.items():
+    print(non_terminal, ":", terminals)
