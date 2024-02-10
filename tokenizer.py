@@ -154,15 +154,4 @@ class tokenFrontEnd:
         pass
 
     pass
-"""
-myTokenizer = Tokenizer()
 
-text:str = fileManger.get_text("hello.txt")
-
-
-my_token_list = myTokenizer.tokenize(text)
-
-my_tokens = myTokenizer.get_token_type(my_token_list)
-for i in my_tokens:
-    i.print()
-"""

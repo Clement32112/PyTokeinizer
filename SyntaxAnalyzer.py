@@ -43,6 +43,8 @@ for non_terminal, terminals in follow_set.items():
 mySyntaxAnalyzer.add_epsilon_rules_predictive()
 # Display output of predictive matrix to the console
 mySyntaxAnalyzer.print_predictive_matrix()
+print("\n")
+#mySyntaxAnalyzer.compute_stack(display=True)
 temp = "" 
 
 while not myLexicalAnalyzer.tokenEnd():
@@ -51,9 +53,9 @@ while not myLexicalAnalyzer.tokenEnd():
     if value == "":
         if temp != "":
             if (mySyntaxAnalyzer.compute_stack(temp,display=True)):
-                print(temp,"is valid")
+                print(temp,"is a valid sentence\n")
             else:
-                print(temp,"failed to be parsed")
+                print(temp,"failed to be parsed\n")
         temp = ""
     else:
         temp = value

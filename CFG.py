@@ -233,7 +233,7 @@ class context_free_grammar:
         parse_string= w
         parse_string= self.valueToProdArray(parse_string) #separate the terminals in the string
         if display:
-            print("\n",parse_string)
+            print(parse_string)
         stack=["$"]
         parse_string.append("$")
         stack.append(self.start_symbol)
