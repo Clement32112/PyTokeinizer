@@ -1,6 +1,7 @@
 import re
 
 class fileManger:
+    @staticmethod
     def get_text(filePath):
         file = open(filePath)
         return (file.read()) 
