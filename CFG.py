@@ -15,6 +15,8 @@ class production_rule:
         return False
     
     def output(self):
+        if self.start_symbol=="":
+            return ""
         return self.start_symbol+" => "+self.value
         
     def copy(self):
@@ -41,19 +43,19 @@ class context_free_grammar:
         print("\n\t",end="")
         for i in self.terminals:
             if i!="£":
-                print("{:<12}".format(i),end="|")
+                print("{:<10}".format(i),end="|")
         #print("\n______________________________________________________",end="")
         for i in self.predictive_matrix:
             print("\n"+i+":",end="\t")
             for j in self.predictive_matrix[i]:
-                print(j,"{:<10}".format(self.predictive_matrix[i][j].output()),end="|")
+                print("{:<10}".format(self.predictive_matrix[i][j].output()),end="|")
                 #print (self.predictive_matrix[i][j]+"\t\t",end="|")
 
     def add_prod_rule(self,prod_rule):
         self.prod_rules.append(prod_rule)
     
     def compute_first(self):
-        myCFG.define_predictive_matrix()
+        
         first = {}
         for non_terminal in self.non_terminals:
             first[non_terminal] = set() #first is dict, key is non_terminal
@@ -90,7 +92,8 @@ class context_free_grammar:
         for non_terminal in self.non_terminals:
             follow[non_terminal] = set() # {E,E`,T,T`,F} 
         follow[self.start_symbol].add('$')  # add end marker to start symbol {E: [$] }
-        self.terminals.append("$")
+        if "$" not in self.terminals:
+            self.terminals.append("$")
 
         while True:
             updated = False
@@ -156,6 +159,7 @@ class context_free_grammar:
         first_set = self.compute_first()
         print("\nFirst set: ",first_set)
         for non_terminal, terminals in first_set.items():
+            print(non_terminal,": ",terminals)
             if "£" in terminals:
                 for term in self.compute_follow()[non_terminal]:
                     new = production_rule(non_terminal,"£")
@@ -163,7 +167,7 @@ class context_free_grammar:
                     print("\nnt and terminal: ", non_terminal,term )
                     print("\nepsilon rule: ", new.output() )
                     #print("epsilon rule: ", self.predictive_matrix[non_terminal][term] )
-                    self.print_predictive_matrix()
+                    #self.print_predictive_matrix()
 
 
     def print_prod_rules(self):
@@ -235,7 +239,7 @@ myCFG.left_recursion()
 myCFG.removeDuplicateProdRules()
 myCFG.print_prod_rules()
 
-
+myCFG.define_predictive_matrix()
 print("\nCompute first and follow funtions: ")
 first_set = myCFG.compute_first()
 print("\nFirst:")
@@ -248,5 +252,5 @@ for non_terminal, terminals in follow_set.items():
     print(non_terminal, ":", terminals) 
 
 myCFG.add_epsilon_rules_predictive()
-#myCFG.print_predictive_matrix()
+myCFG.print_predictive_matrix()
 #print(myCFG.predictive_matrix)
