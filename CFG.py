@@ -21,6 +21,8 @@ class production_rule:
         
     def copy(self):
         return production_rule(self.start_symbol,self.value)
+    def is_null(self):
+        return self.start_symbol == "";
 
 class context_free_grammar:
     def __init__(self,start_symbol,prod_rules,terminals,non_terminals):
@@ -222,24 +224,28 @@ class context_free_grammar:
                         arr.append(i)
         self.prod_rules = arr 
 
-    def compute_stack(self):
-        parse_string="id*id+id"
+    def compute_stack(self,w = "id*id+id",display=False):
+        parse_string= w
         parse_string= self.valueToProdArray(parse_string) #separate the terminals in the string
-        print("\n",parse_string)
-        stack=[]
+        if display:
+            print("\n",parse_string)
+        stack=["$"]
+        parse_string.append("$")
         stack.append(self.start_symbol)
         output=""
-        print("{:<30} {:<30} {:<30}".format("STACK","INPUT","OUTPUT"),end="") #print table column headings
-        
-        print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
+        if display:
+            print("{:<30} {:<30} {:<30}".format("STACK","INPUT","OUTPUT"),end="") #print table column headings
+        if display:
+            print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
 
-        while len(stack)!=0:
+        while stack != ["$"]:
             #when input is empty, so use epsilon
             if len(parse_string)==0:
                 rule = self.predictive_matrix[stack[-1]]["$"] #get prod rule in matrix cell
                 stack.pop(-1)
                 output = rule.start_symbol+"=>"+"".join(rule.value)
-                print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
+                if display:
+                    print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
                 continue 
 
             #when last element in stack is a terminal
@@ -247,12 +253,15 @@ class context_free_grammar:
                 parse_string.pop(0) #remove first element in parse string
                 stack.pop(-1) #remove last element in stack
                 output=[]
-                print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
-
+                if display:
+                    print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
+                continue
 
             #when last element in stack is a non terminal
             else:
                 rule = self.predictive_matrix[stack[-1]][parse_string[0]].copy() #get prod rule in matrix cell
+                if rule.is_null():
+                    return False
                 stack.pop(-1)
 
                 rule.value = self.valueToProdArray(rule.value) #consider terminals with back ticks
@@ -262,9 +271,14 @@ class context_free_grammar:
                     rule.value.reverse() #read prod rule backwards
                     for i in rule.value:
                         stack.append(i)
-                print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
-                #pass
+                if display:
+                    print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
+                continue 
 
+        if parse_string[0] == stack[0] == "$":
+                return True
+        else:
+            return False
         
 
 myRule = production_rule("E", "E+T")
@@ -299,5 +313,11 @@ for non_terminal, terminals in follow_set.items():
 myCFG.add_epsilon_rules_predictive()
 myCFG.print_predictive_matrix()
 #print(myCFG.predictive_matrix)
+print()
+test = ["id+id+id+id","id","()"]
+for i in test:
+    if (myCFG.compute_stack(i,display=True)):
+        print(i,"is valid")
+    else:
+        print(i,"failed to be parsed")
 
-myCFG.compute_stack()
