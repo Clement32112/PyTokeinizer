@@ -354,7 +354,7 @@ class context_free_grammar:
         for key, value in left_factored_rules.items():
             for i in value:
                 self.add_prod_rule(production_rule(key,i))
-
+"""
 myRule = production_rule("E", "E+T")
 myRule2 = production_rule("E", "T")
 myRule3 = production_rule("T", "T*F")
@@ -394,4 +394,4 @@ for i in test:
         print(i,"is valid")
     else:
         print(i,"failed to be parsed")
-
+"""

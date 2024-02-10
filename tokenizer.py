@@ -96,9 +96,62 @@ class Tokenizer:
 
         return token_arr
 
+class tokenFrontEnd:
+    input = ""
+    tokenStream:list[token] = []
+    tokenIndex = -1
+    def __init__(self,filepath):
+        txt = fileManger.get_text(filepath)
+        tokenizer = Tokenizer()
+        tokenstream =  tokenizer.tokenize(txt)
+        self.tokenStream = tokenizer.get_token_type(tokenstream)
+        for i in self.tokenStream:
+            i.print()
+        pass
 
+    def tokenEnd(self):
+        return self.tokenIndex >= len(self.tokenStream)
+    
+    def get_next_token(self) -> str:
+        self.tokenIndex += 1
+        if self.tokenEnd():
+            return ""
+        match self.tokenStream[self.tokenIndex].token_type:
+            case "keyword": 
+                self.input += ""
+            case "operator":
+                if self.tokenStream[self.tokenIndex].value == "=":
+                    self.input = ""
+                else:
+                    self.input += self.tokenStream[self.tokenIndex].value 
+            case "Identifier": 
+                print("Token:", self.tokenStream[self.tokenIndex])
+                self.input += "id" 
+            case "String": 
+                self.input += "" 
+            case "punctuator": 
+                match self.tokenStream[self.tokenIndex].value:
+                    case ";":
+                        self.input = ""
+                    case "{":
+                        self.input = ""
+                    case "}": 
+                        self.input = ""
+                    case _:
+                        self.input += self.tokenStream[self.tokenIndex].value
+            case _:
+                self.input = ""
+        return self.input
 
+    def clear(self):
+        self.input = ""
+        pass
+
+    pass
+
+"""
 myTokenizer = Tokenizer()
+
 text:str = fileManger.get_text("hello.txt")
 
 
@@ -107,3 +160,4 @@ my_token_list = myTokenizer.tokenize(text)
 my_tokens = myTokenizer.get_token_type(my_token_list)
 for i in my_tokens:
     i.print()
+    """
