@@ -22,9 +22,9 @@ class Tokenizer:
     tokenBreakers = [' ','\t',';'] #line breakers
 
     tokenTypes = {
-        "keyword": r"\b(int|main|std|cout|endl|return)\b",
+        "keyword": r"\b(int|main|std|cout|endl|return|float)\b",
         "punctuator": r"[,{}():<>]",
-        "int": r"[0-9*]",
+        "int": r"\d+",
         "operator": r"[+\-*/=%]"
     }
     
@@ -59,15 +59,31 @@ class Tokenizer:
         
         for unprocessed_token in arr:
             found_value = ""
-            for char_index in range(len(str(unprocessed_token))):
+            char_index = 0
+            while char_index < len(str(unprocessed_token)):
                 found_value += str(unprocessed_token)[char_index]
                 for key, value in self.tokenTypes.items():
                         if re.match(value, found_value):
+                            if key == "int":
+                                ind = 0;
+                                bool = True
+                                while bool == True:
+                                    ind += 1; 
+                                    if((char_index+ind) < len(str(unprocessed_token))):
+                                        if re.match(value, str(unprocessed_token)[char_index + ind]):
+                                            found_value += str(unprocessed_token)[char_index + ind]
+                                        else:
+                                            bool = False
+                                    else:
+                                        bool = False
+                                print(ind)
+                                char_index += ind
                             token_arr.append(token(found_value,key))
                             found_value = ""
                             break
                         else:
                             pass
+                char_index+= 1
    
             if re.match(r"\"[a-zA-Z][a-zA-Z0-9\s]*", found_value):
                 token_arr.append(token(found_value,"String"))
