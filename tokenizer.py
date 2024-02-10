@@ -15,6 +15,8 @@ class token:
         self.token_type = type
     def print(self):
         print("{",self.value,":",self.token_type,"}",end=",")
+    def print2(self):
+        print(self.value,":",self.token_type,end="-")
     def __str__(self) -> str:
         return self.value
 
@@ -23,7 +25,7 @@ class Tokenizer:
 
     tokenTypes = {
         "keyword": r"\b(int|main|std|cout|endl|return|float)\b",
-        "punctuator": r"[,{}():<>]",
+        "punctuator": r"[,{}():<>$]",
         "int": r"\d+",
         "operator": r"[+\-*/=%]"
     }
@@ -48,7 +50,9 @@ class Tokenizer:
                     if value in self.tokenBreakers:
                         if len(strInput) == 0:
                             continue
-                        TokenStream.append(token(strInput)) 
+                        TokenStream.append(token(strInput))
+                        if value == ";":
+                            TokenStream.append(token("$"))
                         strInput = ""
                         continue
                     strInput += value
@@ -76,7 +80,7 @@ class Tokenizer:
                                             bool = False
                                     else:
                                         bool = False
-                                print(ind)
+                               # print(ind)
                                 char_index += ind
                             token_arr.append(token(found_value,key))
                             found_value = ""
@@ -107,6 +111,8 @@ class tokenFrontEnd:
         self.tokenStream = tokenizer.get_token_type(tokenstream)
         for i in self.tokenStream:
             i.print()
+            print()
+            print(" -- ", end="")
         pass
 
     def tokenEnd(self):
@@ -131,7 +137,7 @@ class tokenFrontEnd:
                 self.input += "" 
             case "punctuator": 
                 match self.tokenStream[self.tokenIndex].value:
-                    case ";":
+                    case "$":
                         self.input = ""
                     case "{":
                         self.input = ""
@@ -148,7 +154,6 @@ class tokenFrontEnd:
         pass
 
     pass
-
 """
 myTokenizer = Tokenizer()
 
@@ -160,4 +165,4 @@ my_token_list = myTokenizer.tokenize(text)
 my_tokens = myTokenizer.get_token_type(my_token_list)
 for i in my_tokens:
     i.print()
-    """
+"""

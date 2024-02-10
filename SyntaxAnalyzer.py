@@ -49,15 +49,11 @@ while not myLexicalAnalyzer.tokenEnd():
     
     value = myLexicalAnalyzer.get_next_token()
     if value == "":
-        print(temp)
+        if temp != "":
+            if (mySyntaxAnalyzer.compute_stack(temp,display=True)):
+                print(temp,"is valid")
+            else:
+                print(temp,"failed to be parsed")
         temp = ""
     else:
         temp = value
-"""
-print()
-test = ["id+id+id+id","id","()"]
-for i in test:
-    if (mySyntaxAnalyzer.compute_stack(i,display=True)):
-        print(i,"is valid")
-    else:
-        print(i,"failed to be parsed") """

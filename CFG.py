@@ -167,20 +167,15 @@ class context_free_grammar:
             i+= 1
         return prod_array
         
+    # M[A,b] = A ==> a, if epsilon is in the First(a), b is in the Follow(A)
     def add_epsilon_rules_predictive(self):
         first_set = self.compute_first()
-        print("\nFirst set: ",first_set)
         for non_terminal, terminals in first_set.items():
-            print(non_terminal,": ",terminals)
+     #       print(non_terminal,": ",terminals)
             if "£" in terminals:
                 for term in self.compute_follow()[non_terminal]:
                     new = production_rule(non_terminal,"£")
                     self.predictive_matrix[non_terminal][term] = new.copy()
-                    print("\nnt and terminal: ", non_terminal,term )
-                    print("\nepsilon rule: ", new.output() )
-                    #print("epsilon rule: ", self.predictive_matrix[non_terminal][term] )
-                    #self.print_predictive_matrix()
-
 
     def print_prod_rules(self):
         for i in self.prod_rules:

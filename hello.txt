@@ -3,6 +3,5 @@ int main(){
     float number, square;
     float number = 5;
     square = number * number;
-    rectangle = bob + bob;
     return 0;
 }
