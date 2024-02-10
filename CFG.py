@@ -52,6 +52,7 @@ class context_free_grammar:
             for j in self.predictive_matrix[i]:
                 print("{:<10}".format(self.predictive_matrix[i][j].output()),end="|")
                 #print (self.predictive_matrix[i][j]+"\t\t",end="|")
+        print()
 
     def add_prod_rule(self,prod_rule):
         self.prod_rules.append(prod_rule)
@@ -261,6 +262,7 @@ class context_free_grammar:
             else:
                 rule = self.predictive_matrix[stack[-1]][parse_string[0]].copy() #get prod rule in matrix cell
                 if rule.is_null():
+                    print()
                     return False
                 stack.pop(-1)
 
@@ -275,10 +277,12 @@ class context_free_grammar:
                     print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
                 continue 
 
+        print()
         if parse_string[0] == stack[0] == "$":
                 return True
         else:
             return False
+        
         
 
 myRule = production_rule("E", "E+T")
