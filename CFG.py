@@ -238,9 +238,10 @@ class context_free_grammar:
             if len(parse_string)==0:
                 rule = self.predictive_matrix[stack[-1]]["$"] #get prod rule in matrix cell
                 stack.pop(-1)
+                output = rule.start_symbol+"=>"+"".join(rule.value)
                 print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
                 continue 
-            
+
             #when last element in stack is a terminal
             if stack[-1] == parse_string[0]: #compare last element of stack to first element of input string
                 parse_string.pop(0) #remove first element in parse string
@@ -248,11 +249,10 @@ class context_free_grammar:
                 output=[]
                 print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
 
-            
 
             #when last element in stack is a non terminal
             else:
-                rule = self.predictive_matrix[stack[-1]][parse_string[0]] #get prod rule in matrix cell
+                rule = self.predictive_matrix[stack[-1]][parse_string[0]].copy() #get prod rule in matrix cell
                 stack.pop(-1)
 
                 rule.value = self.valueToProdArray(rule.value) #consider terminals with back ticks
