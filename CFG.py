@@ -222,6 +222,51 @@ class context_free_grammar:
                         arr.append(i)
         self.prod_rules = arr 
 
+    def compute_stack(self):
+        parse_string="id*id+id"
+        parse_string= self.valueToProdArray(parse_string) #separate the terminals in the string
+        print("\n",parse_string)
+        stack=[]
+        stack.append(self.start_symbol)
+        output=""
+        print("{:<30} {:<30} {:<30}".format("STACK","INPUT","OUTPUT"),end="") #print table column headings
+        
+        print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
+
+        while len(stack)!=0:
+            #when input is empty, so use epsilon
+            if len(parse_string)==0:
+                rule = self.predictive_matrix[stack[-1]]["$"] #get prod rule in matrix cell
+                stack.pop(-1)
+                print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
+                continue 
+            
+            #when last element in stack is a terminal
+            if stack[-1] == parse_string[0]: #compare last element of stack to first element of input string
+                parse_string.pop(0) #remove first element in parse string
+                stack.pop(-1) #remove last element in stack
+                output=[]
+                print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
+
+            
+
+            #when last element in stack is a non terminal
+            else:
+                rule = self.predictive_matrix[stack[-1]][parse_string[0]] #get prod rule in matrix cell
+                stack.pop(-1)
+
+                rule.value = self.valueToProdArray(rule.value) #consider terminals with back ticks
+                output = rule.start_symbol+"=>"+"".join(rule.value)
+                #print("type ", type(rule.value))
+                if rule.value!= ["£"]:         
+                    rule.value.reverse() #read prod rule backwards
+                    for i in rule.value:
+                        stack.append(i)
+                print("\n{:<30} {:<30} {:<30}".format(''.join(stack), ''.join(parse_string), ''.join(output)),end="|") #print values in stack, input, and output
+                #pass
+
+        
+
 myRule = production_rule("E", "E+T")
 myRule2 = production_rule("E", "T")
 myRule3 = production_rule("T", "T*F")
@@ -254,3 +299,5 @@ for non_terminal, terminals in follow_set.items():
 myCFG.add_epsilon_rules_predictive()
 myCFG.print_predictive_matrix()
 #print(myCFG.predictive_matrix)
+
+myCFG.compute_stack()
